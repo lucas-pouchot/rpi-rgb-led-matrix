@@ -24,63 +24,104 @@
 
 namespace rgb_matrix {
 
-// Transformer for RotateCanvas
-class RotateTransformer : public CanvasTransformer {
-public:
-  RotateTransformer(int angle = 0);
-  virtual ~RotateTransformer();
+	// Transformer for RotateCanvas
+	class RotateTransformer : public CanvasTransformer {
+	public:
+		RotateTransformer(int angle = 0);
+		virtual ~RotateTransformer();
 
-  void SetAngle(int angle);
-  inline int angle() { return angle_; }
-  
-  virtual Canvas *Transform(Canvas *output);
+		void SetAngle(int angle);
+		inline int angle() { return angle_; }
 
-private:
-  // Transformer canvas to rotate the input canvas in 90° steps
-  class TransformCanvas;
+		virtual Canvas *Transform(Canvas *output);
 
-  int angle_;
-  TransformCanvas *const canvas_;
-};
+	private:
+		// Transformer canvas to rotate the input canvas in 90° steps
+		class TransformCanvas;
 
-// Transformer for linked transformer objects
-// First transformer added will be considered last
-// (so it would the transformer that gets the original Canvas object)
-class LinkedTransformer : public CanvasTransformer {
-public:
-  typedef std::vector<CanvasTransformer*> List;
-  
-  LinkedTransformer() {}
-  LinkedTransformer(List transformer_list) : list_(transformer_list) {}
+		int angle_;
+		TransformCanvas *const canvas_;
+	};
 
-  // The ownership of the given transformers is _not_ taken over unless
-  // you explicitly call DeleteTransformers().
-  void AddTransformer(CanvasTransformer *transformer);
-  void AddTransformer(List transformer_list);
-  void SetTransformer(List transformer_list);
+	// Transformer for linked transformer objects
+	// First transformer added will be considered last
+	// (so it would the transformer that gets the original Canvas object)
+	class LinkedTransformer : public CanvasTransformer {
+	public:
+		typedef std::vector<CanvasTransformer*> List;
 
-  // Delete transformers that have been added or set.
-  void DeleteTransformers();
+		LinkedTransformer() {}
+		LinkedTransformer(List transformer_list) : list_(transformer_list) {}
 
-  // -- CanvasTransformer interface
-  virtual Canvas *Transform(Canvas *output);
+		// The ownership of the given transformers is _not_ taken over unless
+		// you explicitly call DeleteTransformers().
+		void AddTransformer(CanvasTransformer *transformer);
+		void AddTransformer(List transformer_list);
+		void SetTransformer(List transformer_list);
 
-private:
-  List list_;
-};
+		// Delete transformers that have been added or set.
+		void DeleteTransformers();
 
-class LargeSquare64x64Transformer : public CanvasTransformer {
-public:
-  LargeSquare64x64Transformer();
-  virtual ~LargeSquare64x64Transformer();
+		// -- CanvasTransformer interface
+		virtual Canvas *Transform(Canvas *output);
 
-  virtual Canvas *Transform(Canvas *output);
+	private:
+		List list_;
+	};
 
-private:
-  class TransformCanvas;
+	class LargeSquare64x64Transformer : public CanvasTransformer {
+	public:
+		LargeSquare64x64Transformer();
+		virtual ~LargeSquare64x64Transformer();
 
-  TransformCanvas *const canvas_;
-};
+		virtual Canvas *Transform(Canvas *output);
+
+	private:
+		class TransformCanvas;
+
+		TransformCanvas *const canvas_;
+	};
+
+	class MultipleRowChainedTransformer : public CanvasTransformer {
+	public:
+		MultipleRowChainedTransformer(int rows = 32, int chain = 4, int  parallel = 1, int sizeOfRow = 4, int linkPoint = 1, char enterMode = 'A', int angle = 0);
+		virtual ~MultipleRowChainedTransformer();
+
+		void SetRows(int rows);
+		inline int rows() { return rows_; }
+
+		void SetChain(int chain);
+		inline int chain() { return chain_; }
+
+		void SetParallel(int parallel);
+		inline int parallel() { return parallel_; }
+
+		void SetSizeOfRow(int sizeOfRow);
+		inline int sizeOfRow() { return sizeOfRow_; }
+
+		void SetLinkPoint(int linkPoint);
+		inline int linkPoint() { return linkPoint_; }
+
+		void SetEnterMode(char enterMode);
+		inline char enterMode() { return enterMode_; }
+
+    void SetAngle(int angle);
+    inline int angle() { return angle_; }
+
+		virtual Canvas *Transform(Canvas *output);
+
+	private:
+		class TransformCanvas;
+
+		int rows_;
+		int chain_;
+		int parallel_;
+		int sizeOfRow_;
+		int linkPoint_;
+		char enterMode_;
+    int angle_;
+		TransformCanvas *const canvas_;
+	};
 
 } // namespace rgb_matrix
 
